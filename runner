@@ -1,0 +1,33 @@
+#!/usr/bin/env bb
+
+(require '[babashka.process :refer [process check destroy-tree]])
+(require '[babashka.classpath :as classpath])
+
+(classpath/add-classpath "src")
+(require '[curly.core :as curly])
+
+
+
+(def hosts
+  {:prod "https://httpbin.org"
+   :qa  "https://qa.httpbin.org"
+   })
+
+(def commands
+  {:post-test {:r/host :prod
+               :r/method :post
+               :r/headers {:Content-Type "application/json"}
+               :r/path "/post"
+               ; :c/verbose true
+               :r/body {:foo "bar"}
+               }
+
+   :get-test {:r/host :prod
+              :r/path "/get"
+              :r/method :get
+              }
+   })
+
+
+(when (= *file* (System/getProperty "babashka.file"))
+  (curly/curl! commands hosts *command-line-args*))
