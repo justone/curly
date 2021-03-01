@@ -2,9 +2,12 @@
   (:require
     [clojure.edn :as edn]
     [clojure.string :as string]
+    [clojure.pprint :refer [pprint]]
 
     [babashka.process :refer [process check destroy-tree]]
     [cheshire.core :as json]
+
+    [curly.shellescape :as shellescape]
     ))
 
 (defn sym-str-single
@@ -80,7 +83,7 @@
         base (commands (keyword command))
         final-command (reduce-opts base opts)
         req (req->curl final-command hosts)]
-    (println (string/join " " req))
-    (clojure.pprint/pprint final-command)
+    (println (string/join " " (map shellescape/quote-str req)))
+    (pprint final-command)
     (check (process req {:inherit true :shutdown destroy-tree}))
     nil))
