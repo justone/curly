@@ -14,11 +14,11 @@
            (curly/reduce-opts {} ["[:c/foo,:bar]" ":baz"])))
     )
   (testing "auto-body"
-    (is (= {:c/body {:foo :baz}}
+    (is (= {:r/body {:foo :baz}}
            (curly/reduce-opts {} [":foo" ":baz"])))
-    (is (= {:c/body {"foo" "baz"}}
+    (is (= {:r/body {"foo" "baz"}}
            (curly/reduce-opts {} ["foo" "baz"])))
-    (is (= {:c/body {:foo {:bar "baz"}}}
+    (is (= {:r/body {:foo {:bar "baz"}}}
            (curly/reduce-opts {} ["[:foo,:bar]" "baz"])))
     )
   )

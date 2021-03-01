@@ -1,2 +1,4 @@
 {:aliases {:test {:extra-deps {lambdaisland/kaocha {:mvn/version "1.0.732"}}
-                  :main-opts ["-m" "kaocha.runner"]}}}
+                  :main-opts ["-m" "kaocha.runner"]}
+           :clj {:extra-deps {babashka/process {:mvn/version "0.0.1"}
+                              cheshire/cheshire {:mvn/version "5.10.0"}}}}}
