@@ -52,7 +52,6 @@
   [req hosts]
   (let [{:r/keys [method body host path headers url]
          :c/keys [verbose]} req]
-    (println (pr-str req))
     (cond-> ["curl" #_"-v"]
       verbose
       (into ["-v"])
@@ -77,13 +76,18 @@
 
       )))
 
+(defn perr
+  [& args]
+  (binding [*out* *err*]
+    (apply println args)))
+
 (defn curl!
   [commands hosts command-line-args]
   (let [[command & opts] command-line-args
         base (commands (keyword command))
         final-command (reduce-opts base opts)
         req (req->curl final-command hosts)]
-    (println (string/join " " (map shellescape/quote-str req)))
-    (pprint final-command)
+    (perr (string/join " " (map shellescape/quote-str req)))
+    (perr (with-out-str (pprint final-command)))
     (check (process req {:inherit true :shutdown destroy-tree}))
     nil))
