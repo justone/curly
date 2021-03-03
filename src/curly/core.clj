@@ -48,6 +48,7 @@
   (cond
     (keyword? v) (subs (str v) 1)
     (number? v) (str v)
+    (boolean? v) (str v)
     :else (name v)
     ))
 
