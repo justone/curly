@@ -52,7 +52,7 @@
   [req hosts]
   (let [{:r/keys [method body host path headers url]
          :c/keys [verbose]} req]
-    (cond-> ["curl" #_"-v"]
+    (cond-> ["curl" "-s"]
       verbose
       (into ["-v"])
 
