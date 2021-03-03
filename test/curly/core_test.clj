@@ -32,8 +32,8 @@
            (curly/encode-body "@body.json" {:Content-Type "application/json"})))
     )
   (testing "form-params"
-    (is (= "foo=bar&baz=qux&ns/key=sym"
-           (curly/encode-body {:foo :bar :baz "qux" :ns/key 'sym} {})))
+    (is (= "foo=bar&baz=qux&ns/key=sym&int=23&float=2.2&ratio=2/3"
+           (curly/encode-body {:foo :bar :baz "qux" :ns/key 'sym :int 23 :float 2.20 :ratio (/ 2 3)} {})))
     (is (= "foo=bar&baz=qux"
            (curly/encode-body "foo=bar&baz=qux" {})))
     )
