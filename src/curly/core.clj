@@ -43,10 +43,20 @@
         (op result k-val v-val)))
     base (partition 2 opts)))
 
+(defn ->str
+  [v]
+  (cond
+    (keyword? v) (subs (str v) 1)
+    :else (name v)
+    ))
+
 (defn encode-body
   [body headers]
-  (case (:Content-Type headers)
-    "application/json" (json/generate-string body)))
+  (if (string? body)
+    body
+    (case (:Content-Type headers)
+      "application/json" (json/generate-string body)
+      (string/join "&" (map #(str (->str (key %)) "=" (->str (val %))) body)))))
 
 (defn req->curl
   [req hosts]
