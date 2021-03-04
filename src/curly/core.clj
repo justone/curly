@@ -6,6 +6,7 @@
 
     [babashka.process :refer [process check destroy-tree]]
     [cheshire.core :as json]
+    [clojure.tools.cli :refer [parse-opts]]
 
     [curly.shellescape :as shellescape]
     ))
@@ -93,13 +94,45 @@
   (binding [*out* *err*]
     (apply println args)))
 
+(def cli-options
+  [["-v" "--verbose" "Show information to help with debugging."]
+   ["-c" "--curl" "Print curl command."]
+   ["-n" "--dry-run" "Don't actually run the command."]
+   ["-h" "--help"]])
+
+(defn print-help
+  [parsed commands hosts]
+  (println "Command line for curl requests.")
+  (println)
+  (println "Available commands:")
+  (println)
+  (doseq [id (sort (keys commands))]
+    (println (str "  " id)))
+  (println)
+  (println "Available hosts:")
+  (println)
+  (doseq [[id host] hosts]
+    (println (str "  " id " - " host)))
+  (println)
+  (println "Options:")
+  (println)
+  (println (:summary parsed)))
+
 (defn curl!
   [commands hosts command-line-args]
-  (let [[command & opts] command-line-args
+  (let [parsed (parse-opts command-line-args cli-options)
+        {:keys [options arguments]} parsed
+        [command & opts] arguments
         base (commands (keyword command))
         final-command (reduce-opts base opts)
         req (req->curl final-command hosts)]
-    (perr (string/join " " (map shellescape/quote-str req)))
-    (perr (with-out-str (pprint final-command)))
-    (check (process req {:inherit true :shutdown destroy-tree}))
+    (when (:help options)
+      (print-help parsed commands hosts)
+      (System/exit 0))
+    (when (:curl options)
+      (perr (string/join " " (map shellescape/quote-str req))))
+    (when (:verbose options)
+      (perr (with-out-str (pprint final-command))))
+    (when-not (:dry-run options)
+      (check (process req {:inherit true :shutdown destroy-tree})))
     nil))

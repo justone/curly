@@ -6,4 +6,5 @@
          :main-opts ["-m" "kaocha.runner"]}
   :clj {;; Additional libs for clojure to match babashka includes
         :extra-deps {babashka/process {:mvn/version "0.0.1"}
-                     cheshire/cheshire {:mvn/version "5.10.0"}}}}}
+                     cheshire/cheshire {:mvn/version "5.10.0"}
+                     org.clojure/tools.cli {:mvn/version "1.0.194"}}}}}
