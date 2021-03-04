@@ -21,11 +21,14 @@
     (map sym-str-single d)
     (sym-str-single d)))
 
+(def non-body-namespaces
+  #{"c" "r"})
+
 (defn promote-body
   [d]
   (let [first-val (if (sequential? d) (first d) d)]
     (if (or (not (keyword? first-val))
-            (nil? (namespace first-val)))
+            (not (non-body-namespaces (namespace first-val))))
       (if (sequential? d)
         (cons :r/body d)
         [:r/body d])

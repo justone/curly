@@ -16,6 +16,8 @@
   (testing "auto-body"
     (is (= {:r/body {:foo :baz}}
            (curly/reduce-opts {} [":foo" ":baz"])))
+    (is (= {:r/body {:other/foo :baz}}
+           (curly/reduce-opts {} [":other/foo" ":baz"])))
     (is (= {:r/body "baz"}
            (curly/reduce-opts {} [":r/body" "baz"])))
     (is (= {:r/body {"foo" "baz"}}
