@@ -129,7 +129,8 @@
         base (commands (keyword command))
         final-command (reduce-opts base opts)
         req (req->curl final-command hosts)]
-    (when (:help options)
+    (when (or (nil? command)
+              (:help options))
       (print-help parsed commands hosts)
       (System/exit 0))
     (when (:curl options)
