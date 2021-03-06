@@ -1,12 +1,9 @@
 #!/usr/bin/env bb
 
-(require '[babashka.process :refer [process check destroy-tree]])
 (require '[babashka.classpath :as classpath])
 
 (classpath/add-classpath "src")
-(require '[curly.core :as curly])
-
-
+(require '[curly.run :as curly])
 
 (def hosts
   {:prod "https://httpbin.org"
