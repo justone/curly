@@ -1,5 +1,6 @@
 (ns curly.run
   (:require
+    [clojure.edn :as edn]
     [clojure.string :as string]
     [clojure.pprint :refer [pprint]]
 
@@ -49,7 +50,7 @@
   (let [parsed (parse-opts command-line-args cli-options)
         {:keys [options arguments]} parsed
         [command & opts] arguments
-        base (commands (keyword command))
+        base (commands (keyword (edn/read-string command)))
         final-command (core/reduce-opts base opts)
         req (core/req->curl final-command hosts)]
     (when (or (nil? command)
