@@ -5,6 +5,7 @@
     [clojure.pprint :refer [pprint]]
 
     [babashka.process :refer [process check destroy-tree]]
+    [babashka.fs :as fs]
     [clojure.tools.cli :refer [parse-opts]]
 
     [curly.shellescape :as shellescape]
@@ -24,11 +25,19 @@
    ["-n" "--dry-run" "Don't actually run the command."]
    ["-h" "--help"]])
 
+(defn- print-command-help
+  [k base]
+  (println "Command:" k)
+  (println)
+  (println "Base:")
+  (pprint base)
+  )
+
 (defn- print-help
   [parsed commands hosts]
   (println "Command line for curl requests.")
   (println)
-  (println "Available commands:")
+  (println (str "Available commands (run with `" (fs/file-name *file*) " [command] -h` to see specific help):"))
   (println)
   (doseq [id (sort (keys commands))]
     (println (str "  " id)))
@@ -54,9 +63,11 @@
         base (commands command-key)
         final-command (core/reduce-opts base opts)
         req (core/req->curl final-command hosts)]
-    (when (or (nil? command)
+    (when (or (nil? base)
               (:help options))
-      (print-help parsed commands hosts)
+      (if base
+        (print-command-help command-key base)
+        (print-help parsed commands hosts))
       (System/exit 0))
     (when (:verbose options)
       (perr "Processing command:" command-key "\n")
