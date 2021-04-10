@@ -58,25 +58,21 @@
   [commands hosts command-line-args]
   (let [parsed (parse-opts command-line-args cli-options)
         {:keys [options arguments]} parsed
-        [command & opts] arguments
-        command-key (keyword (edn/read-string command))
-        base (commands command-key)
-        final-command (core/reduce-opts base opts)
-        req (core/req->curl final-command hosts)]
+        {:keys [command base final curl-command]} (core/interpret-arguments commands hosts arguments)]
     (when (or (nil? base)
               (:help options))
       (if base
-        (print-command-help command-key base)
+        (print-command-help command base)
         (print-help parsed commands hosts))
       (System/exit 0))
     (when (:verbose options)
-      (perr "Processing command:" command-key "\n")
+      (perr "Processing command:" command "\n")
       (perr "Base:")
       (perr (with-out-str (pprint base)))
       (perr "Final:")
-      (perr (with-out-str (pprint final-command))))
+      (perr (with-out-str (pprint final))))
     (when (:curl options)
-      (perr (string/join " " (map shellescape/quote-str req))))
+      (perr (string/join " " (map shellescape/quote-str curl-command))))
     (when-not (:dry-run options)
-      (check (process req {:inherit true :shutdown destroy-tree})))
+      (check (process curl-command {:inherit true :shutdown destroy-tree})))
     nil))

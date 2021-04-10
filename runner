@@ -4,6 +4,7 @@
 
 (classpath/add-classpath "src")
 (require '[curly.run :as curly])
+(require '[curly.ext :as ext])
 
 (def hosts
   {:prod "https://httpbin.org"
@@ -25,6 +26,9 @@
               }
    })
 
+(defmethod ext/munge-command :post-test
+  [_key command]
+  (assoc-in command [:r/body :baz] [1 2 3]))
 
 (when (= *file* (System/getProperty "babashka.file"))
   (curly/curl! commands hosts *command-line-args*))

@@ -4,6 +4,8 @@
     [clojure.string :as string]
 
     [cheshire.core :as json]
+
+    [curly.ext :as ext]
     ))
 
 ;; Opt reducing helpers
@@ -40,8 +42,7 @@
     (keyword? v) (subs (str v) 1)
     (number? v) (str v)
     (boolean? v) (str v)
-    :else (name v)
-    ))
+    :else (str v)))
 
 (defn encode-body
   [body headers]
@@ -67,10 +68,10 @@
         (op result k-val v-val)))
     base (partition 2 opts)))
 
-(defn req->curl
-  [req hosts]
+(defn command->curl
+  [command hosts]
   (let [{:r/keys [method body host path headers url]
-         :c/keys [verbose]} req]
+         :c/keys [verbose]} command]
     (cond-> ["curl" "-s"]
       verbose
       (into ["-v"])
@@ -94,3 +95,25 @@
       (into [(str (hosts host) path)])
 
       )))
+
+(defn interpret-arguments
+  [commands hosts arguments]
+  (let [[command & args] arguments
+        command-key (keyword (edn/read-string command))
+        base (commands command-key)
+        final-command (->> args
+                           (ext/munge-arguments :curly/pre)
+                           (ext/munge-arguments command-key)
+                           (ext/munge-arguments :curly/post)
+                           (reduce-opts base)
+                           (ext/munge-command :curly/pre)
+                           (ext/munge-command command-key)
+                           (ext/munge-command :curly/post))
+        curl-command (->> (command->curl final-command hosts)
+                          (ext/munge-curl-command :curly/pre)
+                          (ext/munge-curl-command command-key)
+                          (ext/munge-curl-command :curly/post))]
+    {:command command-key
+     :base base
+     :final final-command
+     :curl-command curl-command}))
