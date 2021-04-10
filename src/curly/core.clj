@@ -72,9 +72,12 @@
   [command hosts]
   (let [{:r/keys [method body host path headers url]
          :c/keys [verbose]} command]
-    (cond-> ["curl" "-s"]
+    (cond-> ["curl"]
       verbose
       (into ["-v"])
+
+      (not verbose)
+      (into ["-s"])
 
       (or (and (= :post method)
                (nil? body))
@@ -92,7 +95,7 @@
       (into [url])
 
       (and (nil? url) host path)
-      (into [(str (hosts host) path)])
+      (into [(str (or (hosts host) host) path)])
 
       )))
 

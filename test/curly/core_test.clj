@@ -40,3 +40,28 @@
            (curly/encode-body "foo=bar&baz=qux" {})))
     )
   )
+
+(def test-hosts
+  {:prod "https://prod.com"
+   :qa "https://qa.com"})
+
+(deftest curl-command-generation
+  (testing "blank"
+    (is (= ["curl" "-s"]
+           (curly/command->curl {} {}))))
+
+  (testing "curl-opts"
+    (is (= ["curl" "-v"]
+           (curly/command->curl {:c/verbose true} {}))))
+
+  (testing "hosts"
+    (is (= ["curl" "-s" "https://prod.com/foo"]
+           (curly/command->curl {:r/host :prod :r/path "/foo"} test-hosts)))
+    (is (= ["curl" "-s" "https://qa.com/foo"]
+           (curly/command->curl {:r/host :qa :r/path "/foo"} test-hosts)))
+    (is (= ["curl" "-s" "https://one-off.com/foo"]
+           (curly/command->curl {:r/host "https://one-off.com" :r/path "/foo"} test-hosts)))
+    (is (= ["curl" "-s" "https://full-url.com/another"]
+           (curly/command->curl {:r/url "https://full-url.com/another"} test-hosts)))
+    )
+  )
