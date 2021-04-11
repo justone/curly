@@ -24,6 +24,13 @@
               :r/path "/get"
               :r/method :get
               }
+
+   :put-test {:r/host :prod
+              :r/path "/put"
+              :r/headers {:Content-Type "application/json"}
+              :r/method :put
+              :r/body {:foo "bar"}
+              }
    })
 
 (defmethod ext/munge-command :post-test

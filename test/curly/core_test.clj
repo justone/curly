@@ -64,4 +64,51 @@
     (is (= ["curl" "-s" "https://full-url.com/another"]
            (curly/command->curl {:r/url "https://full-url.com/another"} test-hosts)))
     )
+
+  (testing "methods"
+    (is (= ["curl" "-s" "-X" "POST" "https://prod.com/post"]
+           (curly/command->curl {:r/host :prod :r/path "/post" :r/method :post} test-hosts)))
+    (is (= ["curl" "-s" "-d" "foo=bar" "https://prod.com/post"]
+           (curly/command->curl {:r/host :prod :r/path "/post" :r/method :post :r/body {:foo :bar}} test-hosts)))
+    (is (= ["curl" "-s" "-X" "PUT" "-d" "foo=bar" "https://prod.com/put"]
+           (curly/command->curl {:r/host :prod :r/path "/put" :r/method :put :r/body {:foo :bar}} test-hosts)))
+    (is (= ["curl" "-s" "https://prod.com/get"]
+           (curly/command->curl {:r/host :prod :r/path "/get" :r/method :get :r/body {:foo :bar}} test-hosts)))
+
+    )
+
+  (testing "headers"
+    (is (= ["curl" "-s"
+            "-d" "{\"foo\":\"bar\"}"
+            "-H" "Content-Type: application/json"
+            "-H" "Authorization: foo/bar"
+            "-H" "Content-Length: 1524"
+            "https://prod.com/post"]
+           (curly/command->curl
+             {:r/host :prod
+              :r/path "/post"
+              :r/method :post
+              :r/headers {:Content-Type "application/json"
+                          "Authorization" :foo/bar
+                          'Content-Length 1524
+                          }
+              :r/body {:foo :bar}}
+             test-hosts)))
+    )
+
+  (testing "body encode"
+    (is (= ["curl" "-s" "-d" "foo=bar" "https://prod.com/post"]
+           (curly/command->curl {:r/host :prod :r/path "/post" :r/method :post :r/body {:foo :bar}} test-hosts)))
+    (is (= ["curl" "-s"
+            "-d" "{\"foo\":\"bar\"}"
+            "-H" "Content-Type: application/json"
+            "https://prod.com/post"]
+           (curly/command->curl
+             {:r/host :prod
+              :r/path "/post"
+              :r/method :post
+              :r/headers {:Content-Type "application/json"}
+              :r/body {:foo :bar}}
+             test-hosts)))
+    )
   )

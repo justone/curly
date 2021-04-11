@@ -52,6 +52,8 @@
       "application/json" (json/generate-string body)
       (string/join "&" (map #(str (-> % key ->str) "=" (-> % val ->str)) body)))))
 
+(def body-methods #{:put :post})
+
 
 ;; Public interface
 
@@ -79,17 +81,17 @@
       (not verbose)
       (into ["-s"])
 
-      (or (and (= :post method)
+      (or (and (body-methods method)
                (nil? body))
-          (and (= :get method)
-               (some? body)))
+          (= :put method))
       (into ["-X" (string/upper-case (name method))])
 
-      (some? body)
+      (and (body-methods method)
+           (some? body))
       (into ["-d" (encode-body body headers)])
 
       (some? headers)
-      (into (mapcat #(vector "-H" (str (name (first %)) ": " (name (second %)))) headers))
+      (into (mapcat #(vector "-H" (str (->str (first %)) ": " (->str (second %)))) headers))
 
       (some? url)
       (into [url])
