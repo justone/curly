@@ -74,6 +74,8 @@
            (curly/command->curl {:r/host :prod :r/path "/put" :r/method :put :r/body {:foo :bar}} test-hosts)))
     (is (= ["curl" "-s" "https://prod.com/get"]
            (curly/command->curl {:r/host :prod :r/path "/get" :r/method :get :r/body {:foo :bar}} test-hosts)))
+    (is (= ["curl" "-s" "-X" "DELETE" "https://prod.com/users/1"]
+           (curly/command->curl {:r/host :prod :r/path "/users/1" :r/method :delete} test-hosts)))
 
     )
 

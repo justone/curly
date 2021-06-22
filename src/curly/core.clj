@@ -83,7 +83,8 @@
 
       (or (and (body-methods method)
                (nil? body))
-          (= :put method))
+          (= :put method)
+          (= :delete method))
       (into ["-X" (string/upper-case (name method))])
 
       (and (body-methods method)
